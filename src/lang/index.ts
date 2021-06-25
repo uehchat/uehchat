@@ -18,7 +18,6 @@ export default {
             '- timnam: Tìm nam chat cùng',
 
   START_OKAY: '[BOT] OK! Chúng mình sẽ thông báo khi tìm được.',
-  START_WARN_GENDER: '[BOT] Lưu ý: Bạn không chọn giới tính. Có thể bạn sẽ phải đợi lâu hơn.',
   START_ERR_ALREADY: '[BOT] Bạn không thể batdau khi chưa ketthuc...',
 
   WAITING: '[BOT] Đang tìm bạn chat... Nếu bạn muốn đổi giới tính, gửi ketthuc sau đó chọn giới tính mới.',
@@ -31,19 +30,8 @@ export default {
   ERR_ATTACHMENT: '[BOT] Lỗi: Chatbot chưa hỗ trợ gửi dạng dữ liệu này',
   ATTACHMENT_LINK: '[BOT] Bạn ý đã gửi 1 đường link: ',
 
-  GENDER_ERR: '[BOT] Lỗi: Giới tính nhập vào không hợp lệ!\n\nẤn trợ giúp (hoặc gửi trogiup) để xem thêm.',
-  GENDER_WRITE_OK: '[BOT] Bạn đã chọn giới tính mong muốn tìm được là: ',
-  GENDER_WRITE_WARN: '\n\nLưu ý: Tùy chọn này chỉ có tác dụng với PHẦN LỚN các cuộc nói chuyện.',
-  GENDER_ARR_UNKNOWN: 'cả hai',
-  GENDER_ARR_MALE: 'nam',
-  GENDER_ARR_FEMALE: 'nữ',
-
   KEYWORD_START: 'batdau',
   KEYWORD_END: 'ketthuc',
-  KEYWORD_GENDER: 'tim',
-  KEYWORD_GENDER_MALE: 'nam',
-  KEYWORD_GENDER_FEMALE: 'nu',
-  KEYWORD_GENDER_BOTH: 'namnu',
   KEYWORD_HELP: 'trogiup',
   KEYWORD_CAT: 'meow',
   KEYWORD_DOG: 'gauw',

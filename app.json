@@ -1,8 +1,14 @@
 {
-  "name": "PTNK Chatible",
+  "name": "UEH Chatible",
   "description": "Chatible clone written in TypeScript, based on Node, Express and Mongo",
-  "repository": "https://github.com/ptnkchat/ptnkchat",
-  "keywords": ["chatible", "node", "express", "typescript", "mongo"],
+  "repository": "https://github.com/uehchat/uehchat",
+  "keywords": [
+    "chatible",
+    "node",
+    "express",
+    "typescript",
+    "mongo"
+  ],
   "success_url": "/",
-  "website": "https://m.me/ptnkchat"
+  "website": "https://m.me/uehchat"
 }

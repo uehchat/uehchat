@@ -93,7 +93,6 @@ export interface UserProfileResponse {
   profile_pic?: string;
   locale?: string;
   timezone?: string;
-  gender?: string;
   error?: {
     message?: string;
     type?: string;

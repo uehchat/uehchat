@@ -1,5 +1,4 @@
 import { Schema, Document, model } from 'mongoose';
-import GenderEnum from '../../enums/GenderEnum';
 
 const WaitRoomSchema: Schema = new Schema({
   id: {
@@ -7,11 +6,6 @@ const WaitRoomSchema: Schema = new Schema({
     required: true,
     unique: true,
     index: true,
-  },
-  gender: {
-    type: String,
-    enum: Object.keys(GenderEnum),
-    required: true,
   },
   time: {
     type: Date,
@@ -22,7 +16,6 @@ const WaitRoomSchema: Schema = new Schema({
 
 export interface WaitRoomProps extends Document {
   id: string;
-  gender: GenderEnum;
   time: Date;
 }
 

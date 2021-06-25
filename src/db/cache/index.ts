@@ -6,42 +6,35 @@
 import MegaHash from 'megahash';
 import { Mutex } from 'async-mutex';
 
-import { ChatRoomEntry, WaitRoomEntry, GenderEntry, LastPersonEntry } from '../../interfaces/DatabaseEntry';
-import GenderEnum from '../../enums/GenderEnum';
+import { ChatRoomEntry, WaitRoomEntry, LastPersonEntry } from '../../interfaces/DatabaseEntry';
 import logger from '../../utils/logger';
 
 const waitRoomCache = new MegaHash();
 const chatRoomCache = new MegaHash();
-const genderCache = new MegaHash();
 const lastPersonCache = new MegaHash();
 
 // Use mutex to avoid race conditions
 const waitRoomCacheMutex = new Mutex();
 const chatRoomCacheMutex = new Mutex();
-const genderCacheMutex = new Mutex();
 const lastPersonCacheMutex = new Mutex();
 
 interface PartnerProps {
   partner: string;
-  myGender: GenderEnum;
-  partnerGender: GenderEnum;
   time: Date;
   main: boolean;
 }
 
 interface WaitingProps {
-  gender: GenderEnum;
   time: Date;
 }
 
 /**
  * Add user to wait room
  * @param id - ID of user
- * @param gender - Gender of user
  * @param time - Time
  */
-const waitRoomWrite = async (id: string, gender: GenderEnum, time: Date): Promise<void> => {
-  const entry: WaitingProps = { gender, time };
+const waitRoomWrite = async (id: string, time: Date): Promise<void> => {
+  const entry: WaitingProps = { time };
 
   const release = await waitRoomCacheMutex.acquire();
   try {
@@ -100,7 +93,6 @@ const waitRoomRead = async (): Promise<WaitRoomEntry[]> => {
       const temp: WaitingProps = waitRoomCache.get(key);
       ret.push({
         id: key,
-        gender: temp.gender,
         time: new Date(temp.time),
       });
 
@@ -119,29 +111,17 @@ const waitRoomRead = async (): Promise<WaitRoomEntry[]> => {
  * Add paired users to chat room
  * @param id1 - ID of first user
  * @param id2 - ID of second user
- * @param gender1 - Gender of first user
- * @param gender2 - Gender of second user
  * @param time - Time when paired
  */
-const chatRoomWrite = async (
-  id1: string,
-  id2: string,
-  gender1: GenderEnum,
-  gender2: GenderEnum,
-  time: Date,
-): Promise<void> => {
+const chatRoomWrite = async (id1: string, id2: string, time: Date): Promise<void> => {
   const partner1: PartnerProps = {
     partner: id2,
-    myGender: gender1,
-    partnerGender: gender2,
     main: true,
     time,
   };
 
   const partner2: PartnerProps = {
     partner: id1,
-    myGender: gender2,
-    partnerGender: gender1,
     main: false,
     time,
   };
@@ -212,8 +192,6 @@ const chatRoomRead = async (): Promise<ChatRoomEntry[]> => {
         ret.push({
           id1: key,
           id2: temp.partner,
-          gender1: temp.myGender,
-          gender2: temp.partnerGender,
           time: new Date(temp.time),
         });
       }
@@ -222,65 +200,6 @@ const chatRoomRead = async (): Promise<ChatRoomEntry[]> => {
     }
   } catch (err) {
     logger.logError('cache::chatRoomRead', 'This should never happen', err, true);
-  } finally {
-    release();
-  }
-
-  return ret;
-};
-
-/**
- * Save gender in cache
- * @param id - ID of user
- * @param gender - Gender of user
- */
-const genderWrite = async (id: string, gender: GenderEnum): Promise<void> => {
-  const release = await genderCacheMutex.acquire();
-  try {
-    genderCache.set(id, gender);
-  } catch (err) {
-    logger.logError('cache::genderWrite', 'This should never happen', err, true);
-  } finally {
-    release();
-  }
-};
-
-/**
- * Get gender of user
- * Return `null` if not available.
- * @param id - ID of user
- */
-const genderFind = async (id: string): Promise<GenderEnum | null> => {
-  let ret: GenderEnum | null = null;
-
-  const release = await genderCacheMutex.acquire();
-  try {
-    ret = genderCache.has(id) ? genderCache.get(id) : null;
-  } catch (err) {
-    logger.logError('cache::genderFind', 'This should never happen', err, true);
-  } finally {
-    release();
-  }
-
-  return ret;
-};
-
-/**
- * Return gender data
- */
-const genderRead = async (): Promise<GenderEntry[]> => {
-  const ret: GenderEntry[] = [];
-
-  const release = await genderCacheMutex.acquire();
-  try {
-    let key = genderCache.nextKey();
-    while (key) {
-      const gender: GenderEnum = genderCache.get(key);
-      ret.push({ id: key, gender });
-      key = chatRoomCache.nextKey(key);
-    }
-  } catch (err) {
-    logger.logError('cache::genderRead', 'This should never happen', err, true);
   } finally {
     release();
   }
@@ -379,15 +298,6 @@ const clear = async (): Promise<void> => {
   } finally {
     release();
   }
-
-  release = await genderCacheMutex.acquire();
-  try {
-    genderCache.clear();
-  } catch (err) {
-    logger.logError('cache::clear::gender', 'This should never happen', err, true);
-  } finally {
-    release();
-  }
 };
 
 export default {
@@ -400,10 +310,6 @@ export default {
   chatRoomFind,
   chatRoomRemove,
   chatRoomRead,
-
-  genderWrite,
-  genderFind,
-  genderRead,
 
   lastPersonCheck,
   lastPersonWrite,

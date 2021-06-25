@@ -7,9 +7,7 @@ import { Mutex } from 'async-mutex';
 
 import ChatRoom from '../models/chatroom';
 import WaitRoom from '../models/waitroom';
-import Gender from '../models/gender';
 import LastPerson from '../models/lastperson';
-import GenderEnum from '../../enums/GenderEnum';
 import logger from '../../utils/logger';
 
 /**
@@ -19,30 +17,13 @@ import logger from '../../utils/logger';
 const mongoMutex = new Mutex();
 
 /**
- * Save gender to database
- * @param id - ID of user
- * @param gender - Gender of user
- */
-const genderWrite = async (id: string, gender: GenderEnum): Promise<void> => {
-  const release = await mongoMutex.acquire();
-  try {
-    await Gender.findOneAndUpdate({ id }, { $set: { gender } }, { upsert: true });
-  } catch (err) {
-    logger.logError('mongo::genderWrite', 'Failed to save data to MongoDB', err, true);
-  } finally {
-    release();
-  }
-};
-
-/**
  * Add user to wait room
  * @param id - ID of user
- * @param gender - Gender of user
  */
-const waitRoomWrite = async (id: string, gender: GenderEnum, time: Date): Promise<void> => {
+const waitRoomWrite = async (id: string, time: Date): Promise<void> => {
   const release = await mongoMutex.acquire();
   try {
-    await WaitRoom.findOneAndUpdate({ id }, { $set: { gender, time } }, { upsert: true });
+    await WaitRoom.findOneAndUpdate({ id }, { $set: { time } }, { upsert: true });
   } catch (err) {
     logger.logError('mongo::waitRoomWrite', 'Failed to save data to MongoDB', err, true);
   } finally {
@@ -69,20 +50,12 @@ const waitRoomRemove = async (id: string): Promise<void> => {
  * Add paired users to chat room
  * @param id1 - ID of first user
  * @param id2 - ID of second user
- * @param gender1 - Gender of first user
- * @param gender2 - Gender of second user
  * @param time - Time when paired
  */
-const chatRoomWrite = async (
-  id1: string,
-  id2: string,
-  gender1: GenderEnum,
-  gender2: GenderEnum,
-  time: Date,
-): Promise<void> => {
+const chatRoomWrite = async (id1: string, id2: string, time: Date): Promise<void> => {
   const release = await mongoMutex.acquire();
   try {
-    await ChatRoom.findOneAndUpdate({ id1 }, { $set: { id2, gender1, gender2, time } }, { upsert: true });
+    await ChatRoom.findOneAndUpdate({ id1 }, { $set: { id2, time } }, { upsert: true });
   } catch (err) {
     logger.logError('mongo::chatRoomWrite', 'Failed to save data to MongoDB', err, true);
   } finally {
@@ -140,12 +113,6 @@ const resetDatabase = async (): Promise<void> => {
   }
 
   try {
-    await Gender.deleteMany({});
-  } catch (err) {
-    logger.logError('mongo::resetDatabase::gender', 'Failed to save data to MongoDB', err, true);
-  }
-
-  try {
     await LastPerson.deleteMany({});
   } catch (err) {
     logger.logError('mongo::resetDatabase::lastPerson', 'Failed to save data to MongoDB', err, true);
@@ -155,7 +122,6 @@ const resetDatabase = async (): Promise<void> => {
 };
 
 export default {
-  genderWrite,
   waitRoomWrite,
   waitRoomRemove,
   chatRoomWrite,

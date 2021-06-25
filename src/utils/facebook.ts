@@ -41,14 +41,9 @@ const persistent_menu = [
         payload: lang.KEYWORD_DOG,
       },
       {
-        title: 'tìm nam',
+        title: 'bắt đầu',
         type: 'postback',
-        payload: lang.KEYWORD_GENDER + lang.KEYWORD_GENDER_MALE,
-      },
-      {
-        title: 'tìm nữ',
-        type: 'postback',
-        payload: lang.KEYWORD_GENDER + lang.KEYWORD_GENDER_FEMALE,
+        payload: lang.KEYWORD_START,
       },
       {
         title: 'kết thúc',
@@ -84,19 +79,6 @@ const quick_buttons_generic: Array<SendQuickReply> = [
     content_type: 'text',
     title: 'trợ giúp',
     payload: lang.KEYWORD_HELP,
-  },
-];
-
-const quick_buttons_genders: Array<SendQuickReply> = [
-  {
-    content_type: 'text',
-    title: 'tìm nam',
-    payload: lang.KEYWORD_GENDER + lang.KEYWORD_GENDER_MALE,
-  },
-  {
-    content_type: 'text',
-    title: 'tìm nữ',
-    payload: lang.KEYWORD_GENDER + lang.KEYWORD_GENDER_FEMALE,
   },
 ];
 
@@ -271,7 +253,6 @@ const sendMessage = async (
  * @param type - Type of attachment (`image`, `video`, `audio`, `file`)
  * @param url - URL of attachment
  * @param showGenericButton - Should show generic button
- * @param showGenderButton - Should show gender button
  * @param usePersona - Should send with persona
  */
 const sendAttachment = async (
@@ -280,15 +261,11 @@ const sendAttachment = async (
   type: string,
   url: string,
   showGenericButton: boolean,
-  showGenderButton: boolean,
   usePersona: boolean,
 ): Promise<void> => {
   let quick_replies: Array<SendQuickReply> = [];
   if (showGenericButton) {
     quick_replies = quick_replies.concat(quick_buttons_generic);
-  }
-  if (showGenderButton) {
-    quick_replies = quick_replies.concat(quick_buttons_genders);
   }
 
   const message: SendMessageObject = {
@@ -298,7 +275,7 @@ const sendAttachment = async (
     },
   };
 
-  if (showGenericButton || showGenderButton) {
+  if (showGenericButton) {
     message.quick_replies = quick_replies;
   }
 
@@ -323,7 +300,6 @@ const sendTextMessage = async (sender: string, receiver: string, text: string, u
  * @param showStartButton - Should show start button
  * @param showReportButton - Should show report button
  * @param showGenericButton - Should show generic button
- * @param showGenderButton - Should show gender button
  * @param usePersona - Should send with persona
  */
 const sendTextButtons = async (
@@ -332,7 +308,6 @@ const sendTextButtons = async (
   showStartButton: boolean,
   showReportButton: boolean,
   showGenericButton: boolean,
-  showGenderButton: boolean,
   usePersona: boolean,
 ): Promise<void> => {
   const buttons = [];
@@ -349,13 +324,10 @@ const sendTextButtons = async (
   if (showGenericButton) {
     quick_replies = quick_replies.concat(quick_buttons_generic);
   }
-  if (showGenderButton) {
-    quick_replies = quick_replies.concat(quick_buttons_genders);
-  }
 
   const messageData: SendMessageObject = {};
 
-  if (showGenericButton || showGenderButton) {
+  if (showGenericButton) {
     messageData.quick_replies = quick_replies;
   }
 
@@ -406,7 +378,7 @@ const sendSeenIndicator = async (receiver: string): Promise<void> => {
 const getUserData = async (id: string): Promise<UserProfileResponse> => {
   try {
     const res = await phin({
-      url: u(`/${id}?access_token=${config.PAGE_ACCESS_TOKEN}&fields=name,first_name,last_name,profile_pic,gender`),
+      url: u(`/${id}?access_token=${config.PAGE_ACCESS_TOKEN}&fields=name,first_name,last_name,profile_pic`),
       method: 'GET',
       parse: 'json',
     });

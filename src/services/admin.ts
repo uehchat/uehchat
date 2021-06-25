@@ -8,8 +8,7 @@ import pidusage from 'pidusage';
 import db from '../db';
 import lang from '../lang';
 import fb from '../utils/facebook';
-import GenderEnum from '../enums/GenderEnum';
-import { ChatRoomEntry, WaitRoomEntry, GenderEntry, LastPersonEntry } from '../interfaces/DatabaseEntry';
+import { ChatRoomEntry, WaitRoomEntry, LastPersonEntry } from '../interfaces/DatabaseEntry';
 import { AdminReplyProps } from '../interfaces/AdminReplyProps';
 
 /**
@@ -34,7 +33,6 @@ const readWaitRoom = async (): Promise<AdminReplyProps> => {
 const createBackup = async (): Promise<AdminReplyProps> => {
   const chatRoomList: ChatRoomEntry[] = await db.getListChatRoom();
   const waitRoomList: WaitRoomEntry[] = await db.getListWaitRoom();
-  const genderList: GenderEntry[] = await db.getListGender();
   const lastPersonList: LastPersonEntry[] = await db.getListLastPerson();
 
   return {
@@ -42,7 +40,6 @@ const createBackup = async (): Promise<AdminReplyProps> => {
     error: false,
     chatRoom: chatRoomList,
     waitRoom: waitRoomList,
-    gender: genderList,
     lastPerson: lastPersonList,
   };
 };
@@ -60,10 +57,6 @@ const restoreBackup = async (data: AdminReplyProps): Promise<AdminReplyProps> =>
     return { success: false, error: true, errorType: 'Invalid wait room data' };
   }
 
-  if (!Array.isArray(data.gender)) {
-    return { success: false, error: true, errorType: 'Invalid gender data' };
-  }
-
   if (!Array.isArray(data.lastPerson)) {
     return { success: false, error: true, errorType: 'Invalid last person data' };
   }
@@ -71,15 +64,11 @@ const restoreBackup = async (data: AdminReplyProps): Promise<AdminReplyProps> =>
   await db.resetDatabase();
 
   data.chatRoom.forEach(async (entry: ChatRoomEntry) => {
-    await db.writeToChatRoom(entry.id1, entry.id2, entry.gender1, entry.gender2, entry.time);
+    await db.writeToChatRoom(entry.id1, entry.id2, entry.time);
   });
 
   data.waitRoom.forEach(async (entry: WaitRoomEntry) => {
-    await db.writeToWaitRoom(entry.id, entry.gender, entry.time);
-  });
-
-  data.gender.forEach(async (entry: GenderEntry) => {
-    await db.setGender(entry.id, entry.gender);
+    await db.writeToWaitRoom(entry.id, entry.time);
   });
 
   data.lastPerson.forEach(async (entry: LastPersonEntry) => {
@@ -119,22 +108,15 @@ const readStats = async (): Promise<AdminReplyProps> => {
  * Forcefully connect two users (only if neither of them is in chat room)
  * @param id1 - ID of first user
  * @param id2 - ID of second user
- * @param gender1 - Gender of first user
- * @param gender2 - Gender of second user
  */
-const forceMatch = async (
-  id1: string,
-  id2: string,
-  gender1: GenderEnum,
-  gender2: GenderEnum,
-): Promise<AdminReplyProps> => {
+const forceMatch = async (id1: string, id2: string): Promise<AdminReplyProps> => {
   await db.removeFromWaitRoom(id1);
   await db.removeFromWaitRoom(id2);
 
   const partner1: string | null = await db.findPartnerChatRoom(id1);
   const partner2: string | null = await db.findPartnerChatRoom(id2);
   if (partner1 === null && partner2 === null) {
-    await db.writeToChatRoom(id1, id2, gender1, gender2);
+    await db.writeToChatRoom(id1, id2);
   }
 
   return { success: true, error: false };
@@ -148,10 +130,10 @@ const forceMatch = async (
 const forceRemove = async (id: string): Promise<AdminReplyProps> => {
   const partner = await db.findPartnerChatRoom(id);
   if (partner) {
-    await fb.sendTextButtons(id, lang.END_CHAT_PARTNER, true, true, true, true, false);
-    await fb.sendTextButtons(partner, lang.END_CHAT_PARTNER, true, true, true, true, false);
+    await fb.sendTextButtons(id, lang.END_CHAT_PARTNER, true, true, true, false);
+    await fb.sendTextButtons(partner, lang.END_CHAT_PARTNER, true, true, true, false);
   } else {
-    await fb.sendTextButtons(id, lang.END_CHAT_FORCE, true, false, true, true, false);
+    await fb.sendTextButtons(id, lang.END_CHAT_FORCE, true, false, true, false);
   }
   await db.removeFromChatRoom(id);
   await db.removeFromWaitRoom(id);
