@@ -12,10 +12,7 @@ export default {
             '- ketthuc: Kết thúc chat\n' +
             '- trogiup: Xem trợ giúp\n' +
             '- meow: Xem ảnh mèo\n' +
-            '- gauw: Xem ảnh cún\n\n' +
-            'Các lệnh có thể dùng khi đang không chat:\n' +
-            '- timnu: Tìm nữ chat cùng\n' +
-            '- timnam: Tìm nam chat cùng',
+            '- gauw: Xem ảnh cún',
 
   START_OKAY: '[BOT] OK! Chúng mình sẽ thông báo khi tìm được.',
   START_ERR_ALREADY: '[BOT] Bạn không thể batdau khi chưa ketthuc...',
