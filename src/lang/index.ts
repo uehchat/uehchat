@@ -3,7 +3,7 @@ import config from '../config';
 export default {
   MAINTENANCE: '[BOT] Server hiện đang bảo trì...',
 
-  FIRST_COME: '[BOT] Chào mừng bạn đến với ' + config.APP_DISPLAY_NAME + '. Trước khi bắt đầu, hãy chắc chắn rằng bạn đã chọn đúng giới tính người muốn chat cùng.\n\nẤn trợ giúp (hoặc gửi trogiup) để xem thêm.',
+  FIRST_COME: '[BOT] Chào mừng bạn đến với ' + config.APP_DISPLAY_NAME + '.\n\nẤn trợ giúp (hoặc gửi trogiup) để xem hướng dẫn.',
 
   INSTRUCTION: '[BOT] Gửi batdau hoặc bấm vào nút để tìm bạn chat.',
 
@@ -17,7 +17,7 @@ export default {
   START_OKAY: '[BOT] OK! Chúng mình sẽ thông báo khi tìm được.',
   START_ERR_ALREADY: '[BOT] Bạn không thể batdau khi chưa ketthuc...',
 
-  WAITING: '[BOT] Đang tìm bạn chat... Nếu bạn muốn đổi giới tính, gửi ketthuc sau đó chọn giới tính mới.',
+  WAITING: '[BOT] Đang tìm bạn chat...',
   CONNECTED: '[BOT] Connected! Nếu muốn kết thúc, hãy gửi ketthuc',
 
   END_CHAT: '[BOT] End chat!\nGửi batdau hoặc bấm vào nút để tìm bạn chat.',
